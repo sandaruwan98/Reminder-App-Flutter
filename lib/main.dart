@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'SecondPage.dart';
 
@@ -97,7 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
           delegate: SliverChildBuilderDelegate(
             (BuildContext context, int index) {
               return Dismissible(
-                child: Text('data'),
+                child: myCardDetails(index, context, setState),
                 key: Key(UniqueKey().toString()),
                 background: Container(
                   child: Row(
@@ -185,13 +184,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
                         listVno.add(teditVno.text);
                         list.add(teditName.text);
-                        _notificationPlugin.showWeeklyAtDayAndTime(
-                            Time(12, 26, 00),
-                            Day.Monday,
-                            0,
-                            teditVno.text,
-                            'Your ${teditName.text} is expire soon');
-
+                        
                         Navigator.pop(context);
 
                         setState(() {});
@@ -221,3 +214,160 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 //---------------------------------------------------- CARD -------------------------------------
+
+Widget myCardDetails(int index, BuildContext context, Function setstate) {
+  return Padding(
+    padding: const EdgeInsets.only(top: 6, bottom: 6),
+    child: FlatButton(
+      splashColor: Colors.white,
+      highlightColor: Colors.white,
+      // shape: RoundedRectangleBorder(
+      //   borderRadius: BorderRadius.circular(98.0),
+      // ),
+      //elevation: 6.0,
+
+      child: Material(
+        color: Colors.yellow,
+        elevation: 6.0,
+        borderRadius: BorderRadius.circular(9.0),
+        shadowColor: Color(0x802196F3),
+        child: Padding(
+          padding: EdgeInsets.all(10.0),
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            height: 150.0,
+            child: Center(
+                child: Column(
+              children: <Widget>[
+                Text(
+                  list[index],
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontSize: 37,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                SizedBox(
+                  height: 30,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(
+                      'Exp',
+                      style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w100),
+                    ),
+                    Text(
+                      'Vehicle No',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w100),
+                    )
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(
+                      _date[index],
+                      style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 27,
+                          fontWeight: FontWeight.lerp(
+                              FontWeight.w200, FontWeight.bold, 0.5)),
+                    ),
+                    Text(
+                      listVno[index],
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 25,
+                          fontWeight: FontWeight.w200),
+                    )
+                  ],
+                )
+              ],
+            )),
+          ),
+        ),
+      ),
+      onPressed: () {
+        //--------------------  UPDATE CARD ALERT---------------------------------
+        teditName.text = list[index];
+        teditVno.text = listVno[index];
+        return Alert(
+            style: const AlertStyle(
+                animationType: AnimationType.grow,
+                backgroundColor: Color(0xFFFFEB3B)),
+            context: context,
+            title: "Update Card",
+            content: Column(
+              children: <Widget>[
+                TextField(
+                  controller: teditName,
+                  decoration: InputDecoration(
+                    icon: Icon(Icons.add_comment),
+                    labelText: 'Name',
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                TextField(
+                  controller: teditDis,
+                  decoration: InputDecoration(
+                    icon: Icon(Icons.announcement),
+                    labelText: 'Discription',
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                TextField(
+                  controller: teditVno,
+                  decoration: InputDecoration(
+                    icon: Icon(Icons.airplay),
+                    labelText: 'Vehicle No(Only for License etc)',
+                  ),
+                ),
+              ],
+            ),
+            buttons: [
+              DialogButton(
+                onPressed: () {
+                  // ------- SHOW DatePicker UPDATE--------
+
+                  DatePicker.showDatePicker(context,
+                      theme: DatePickerTheme(
+                        backgroundColor: Color(0xFFFFEB3B),
+                        containerHeight: 210.0,
+                      ),
+                      showTitleActions: true,
+                      minTime: DateTime(2010, 12, 31),
+                      maxTime: DateTime(2025, 12, 31), onConfirm: (date) {
+                    _date[index] = '${date.year} - ${date.month} - ${date.day}';
+
+                    //  currentDate= '${date.year}${date.month}${date.day}';
+                    list[index] = teditName.text;
+                    listVno[index] = teditVno.text;
+                    setstate(() {});
+                    Navigator.pop(context);
+                  },
+                      currentTime: DateTime.parse('20200101'),
+                      locale: LocaleType.en);
+                },
+                child: Text(
+                  "ADD Expire Date",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+              )
+            ]).show();
+        //----------------------------------------------------------------------
+      },
+    ),
+  );
+}
+
