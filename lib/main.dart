@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'SecondPage.dart';
+import 'notificationPlugin.dart';
+import 'DBhelper.dart';
 
 void main() => runApp(MyApp());
 
@@ -49,6 +52,7 @@ List<String> listVno = [];
 List<String> _date = [];
 
 class _MyHomePageState extends State<MyHomePage> {
+  final NotificationPlugin _notificationPlugin = NotificationPlugin();
 
   // showNotification() async {
   //   var android = AndroidNotificationDetails(
@@ -184,7 +188,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
                         listVno.add(teditVno.text);
                         list.add(teditName.text);
-                        
+                        _notificationPlugin.showWeeklyAtDayAndTime(
+                            Time(12, 26, 00),
+                            Day.Monday,
+                            0,
+                            teditVno.text,
+                            'Your ${teditName.text} is expire soon');
+
                         Navigator.pop(context);
 
                         setState(() {});
@@ -371,3 +381,63 @@ Widget myCardDetails(int index, BuildContext context, Function setstate) {
   );
 }
 
+// RaisedButton(
+//   onPressed: () {},
+//   shape: RoundedRectangleBorder(
+//       borderRadius: BorderRadius.circular(5.0)),
+//   child: Row(
+//     children: <Widget>[
+//       Container(
+//         alignment: Alignment.center,
+//         width: 250,
+//         child: Row(
+//           mainAxisAlignment: MainAxisAlignment.center,
+//           children: <Widget>[
+//             Icon(
+//               Icons.date_range,
+//               size: 18.0,
+//               color: Colors.teal,
+//             ),
+//             SizedBox(
+//               width: 5,
+//             ),
+//             Text(
+//               _date,
+//               style: TextStyle(
+//                 color: Colors.teal,
+//                 fontWeight: FontWeight.bold,
+//                 fontSize: 18.0,
+//               ),
+//             )
+//           ],
+//         ),
+//       ),
+//     ],
+//   ),
+//   color: Colors.white,
+// )
+
+
+//read data from DB
+ _read() async {
+        DatabaseHelper helper = DatabaseHelper.instance;
+        int rowId = 1;
+        Word word = await helper.queryWord(rowId);
+        if (word == null) {
+          print('read row $rowId: empty');
+        } else {
+          print('read row $rowId: ${word.word} ${word.frequency}');
+        }
+      }
+
+
+
+//save data to DB
+_save() async {
+        Word word = Word();
+        word.word = 'hello';
+        word.frequency = 15;
+        DatabaseHelper helper = DatabaseHelper.instance;
+        int id = await helper.insert(word);
+        print('inserted row: $id');
+      }
