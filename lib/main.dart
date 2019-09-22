@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:sqflite/sqflite.dart';
 
 import 'SecondPage.dart';
 import 'notificationPlugin.dart';
@@ -50,10 +53,21 @@ final teditVno = new TextEditingController();
 List<String> list = [];
 List<String> listVno = [];
 List<String> _date = [];
+ 
+
 
 class _MyHomePageState extends State<MyHomePage> {
   final NotificationPlugin _notificationPlugin = NotificationPlugin();
-
+  @override
+  void initState() {
+    // TODO: implement initState
+//     _save();
+//  _save();
+     _read();
+     
+    super.initState();
+   
+  }
   // showNotification() async {
   //   var android = AndroidNotificationDetails(
   //       'channel id', 'channel name', 'channel description');
@@ -66,6 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+     setState(() { });
     return Scaffold(
       backgroundColor: Colors.blue[50],
       // appBar: AppBar(
@@ -134,7 +149,7 @@ class _MyHomePageState extends State<MyHomePage> {
         hoverColor: Colors.blue,
         onPressed: () {
           //--------------------  ADD CARD ALERT---------------------------------------
-          setState(() {
+          setState(()  {
             return Alert(
                 style: const AlertStyle(
                     animationType: AnimationType.shrink,
@@ -417,17 +432,35 @@ Widget myCardDetails(int index, BuildContext context, Function setstate) {
 //   color: Colors.white,
 // )
 
+void wordtoList(Word word){
+    list.add(word.word);
+    listVno.add(word.vno);
+    _date.add(word.date);
+}
+  
+
+Word listtoWord(int i){
+    Word word = Word();
+    word.word = list[i];
+    word.vno = listVno[i];
+    word.date = _date[i];
+    return word;
+}
+
+
 
 //read data from DB
  _read() async {
         DatabaseHelper helper = DatabaseHelper.instance;
-        int rowId = 1;
-        Word word = await helper.queryWord(rowId);
-        if (word == null) {
-          print('read row $rowId: empty');
-        } else {
-          print('read row $rowId: ${word.word} ${word.frequency}');
+        Database db = await helper.database;
+        List<Map> list = await db.rawQuery('SELECT * FROM $tableWords');
+        int count = list.length;
+      
+        for (var i = 1; i < count; i++) {
+           wordtoList(await helper.queryWord(i));
         }
+       
+
       }
 
 
@@ -436,7 +469,8 @@ Widget myCardDetails(int index, BuildContext context, Function setstate) {
 _save() async {
         Word word = Word();
         word.word = 'hello';
-        word.frequency = 15;
+        word.vno = '15';
+        word.date = 'date';
         DatabaseHelper helper = DatabaseHelper.instance;
         int id = await helper.insert(word);
         print('inserted row: $id');
