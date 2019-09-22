@@ -61,12 +61,13 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     // TODO: implement initState
-//     _save();
-//  _save();
-     _read();
-     
+  //   _save();
+  // _save();
+    
+    
     super.initState();
-   
+    _read();
+   // build(context);
   }
   // showNotification() async {
   //   var android = AndroidNotificationDetails(
@@ -80,7 +81,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-     setState(() { });
+     
     return Scaffold(
       backgroundColor: Colors.blue[50],
       // appBar: AppBar(
@@ -148,8 +149,9 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: FloatingActionButton(
         hoverColor: Colors.blue,
         onPressed: () {
+         //  _save('name', 'vno', 'date');
           //--------------------  ADD CARD ALERT---------------------------------------
-          setState(()  {
+          setState(()  {});
             return Alert(
                 style: const AlertStyle(
                     animationType: AnimationType.shrink,
@@ -199,10 +201,12 @@ class _MyHomePageState extends State<MyHomePage> {
                           showTitleActions: true,
                           minTime: DateTime(2015, 01, 01),
                           maxTime: DateTime(2025, 12, 31), onConfirm: (date) {
+                           
                         _date.add('${date.year} - ${date.month} - ${date.day}');
-
+                        
                         listVno.add(teditVno.text);
                         list.add(teditName.text);
+                         _save(teditName.text, teditVno.text,_date.last);
                         _notificationPlugin.showWeeklyAtDayAndTime(
                             Time(12, 26, 00),
                             Day.Monday,
@@ -221,7 +225,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   )
                 ]).show();
-          });
+         
         },
         tooltip: 'Add Reminder',
         child: Icon(Icons.add),
@@ -378,6 +382,7 @@ Widget myCardDetails(int index, BuildContext context, Function setstate) {
                     //  currentDate= '${date.year}${date.month}${date.day}';
                     list[index] = teditName.text;
                     listVno[index] = teditVno.text;
+                    _update(index+1, list[index], listVno[index], _date[index]);
                     setstate(() {});
                     Navigator.pop(context);
                   },
@@ -456,22 +461,36 @@ Word listtoWord(int i){
         List<Map> list = await db.rawQuery('SELECT * FROM $tableWords');
         int count = list.length;
       
-        for (var i = 1; i < count; i++) {
+        for (var i = 1; i < count+1; i++) {
            wordtoList(await helper.queryWord(i));
         }
        
 
-      }
+}
 
 
 
 //save data to DB
-_save() async {
+_save(String name,String vno,String date) async {
         Word word = Word();
-        word.word = 'hello';
-        word.vno = '15';
-        word.date = 'date';
+        word.word = name;
+        word.vno = vno;
+        word.date = date;
         DatabaseHelper helper = DatabaseHelper.instance;
         int id = await helper.insert(word);
         print('inserted row: $id');
-      }
+}
+
+
+
+
+//update data to DB
+_update(int i,String name,String vno,String date) async {
+        Word word = Word();
+        word.word = name;
+        word.vno = vno;
+        word.date = date;
+        DatabaseHelper helper = DatabaseHelper.instance;
+        int id = await helper.update(i,word);
+        print('updated row: $id');
+}

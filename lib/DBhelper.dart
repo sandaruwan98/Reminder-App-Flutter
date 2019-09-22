@@ -91,6 +91,18 @@ import 'dart:io';
         Database db = await database;
         int id = await db.insert(tableWords, word.toMap());
         return id;
+        
+      }
+
+
+       Future<int> update(int id,Word word) async {
+        Database db = await database;
+        int i = await db.update(tableWords, word.toMap(),
+            where: '$columnId = ?',
+            whereArgs: [id]
+            );
+        return i;
+        
       }
 
       Future<Word> queryWord(int id) async {
