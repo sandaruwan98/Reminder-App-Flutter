@@ -138,6 +138,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     list.removeAt(index);
                     listVno.removeAt(index);
                     _date.removeAt(index);
+                    print('object - $index');
+                   // _delete(index+1);
                   });
                 },
               );
@@ -493,4 +495,14 @@ _update(int i,String name,String vno,String date) async {
         DatabaseHelper helper = DatabaseHelper.instance;
         int id = await helper.update(i,word);
         print('updated row: $id');
+}
+
+
+
+//update data to DB
+_delete(int i) async {
+       
+        DatabaseHelper helper = DatabaseHelper.instance;
+        int id = await helper.delete(i);
+        print('deleted row: $id');
 }

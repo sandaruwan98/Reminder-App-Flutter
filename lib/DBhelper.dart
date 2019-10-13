@@ -105,6 +105,19 @@ import 'dart:io';
         
       }
 
+
+      
+       Future<int> delete(int id) async {
+        Database db = await database;
+       
+        int i = await db.delete(tableWords, 
+            where: '$columnId = ?',
+            whereArgs: [id]
+            );
+        return i;
+        
+      }
+
       Future<Word> queryWord(int id) async {
         Database db = await database;
         List<Map> maps = await db.query(tableWords,
