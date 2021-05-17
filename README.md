@@ -1,4 +1,4 @@
-# My Reminder app
+# Reminder app
 
 A new Flutter project.
 
